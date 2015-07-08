@@ -1,0 +1,21 @@
+    
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+  <h3> Edit Item </h3>
+
+    <form action = "{{url_for('editItem', category_name = category_name, item_name = item_name)}}" method = 'POST' id = 'editItem'>
+      Name: <input type = 'text' size = '30' name = itemName placeholder = "{{item.name}}"> <br><br>
+      Description:<br>
+      <textarea rows ="4" cols="50" name = 'description' form='editItem' placeholder ="{{item.description}}" ></textarea> <br><br>
+        <select name="categoryName">
+          {% for category in categories %}
+          <option value="{{ category.name }}">{{ category.name }}</option>
+          {% endfor %}
+        </select><br><br>
+        <input type = "submit" value = "Submit">
+        <a href = "{{url_for('showCatalog')}}"> Cancel </a> 
+    </form>
+
+{% endblock %}

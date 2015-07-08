@@ -1,0 +1,9 @@
+<html>
+  <body>
+    <h1> Add a new Category</h1>
+    <form action = "{{url_for('newCategory')}}" method = 'POST' id = 'newCategory'> 
+      Name: <input type = 'text' size = '30' name = 'category'>
+      <input type = "submit" value = "Submit"></form>
+    <textarea rows ="4" cols="50" name = 'description' form='newCategory' placeholder = "Enter description here..."></textarea>
+  </body>
+</html>

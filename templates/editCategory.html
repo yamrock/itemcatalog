@@ -1,0 +1,9 @@
+<html>
+  <body>
+    <form action = "{{url_for('editCategory', category_id = category_id)}}" method = 'POST' id = 'editCategory'>
+      Name: <input type = 'text' size = '30' name = 'category' placeholder = {{current_category.name}}>
+      <input type = "submit" value = "Submit"></form>
+    <textarea rows ="4" cols="50" name = 'description' placeholder = "{{current_category.description}}"  form='editCategory'></textarea>
+      <a href = {{url_for('showCatalog')}}> Cancel </a>
+  </body>
+</html>

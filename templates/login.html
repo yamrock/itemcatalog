@@ -1,0 +1,75 @@
+
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<script>
+    //FB LOGIN SCRIPT
+          
+              // Load the SDK asynchronously
+              (function(d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) return;
+                js = d.createElement(s); js.id = id;
+                js.src = "//connect.facebook.net/en_US/sdk.js";
+                fjs.parentNode.insertBefore(js, fjs);
+              }(document, 'script', 'facebook-jssdk'));
+
+        
+            window.fbAsyncInit = function() {
+              FB.init({
+                appId      : '676303592502379',
+                cookie     : true,  // enable cookies to allow the server to access 
+                                    // the session
+                xfbml      : true,  // parse social plugins on this page
+                version    : 'v2.2' // use version 2.2
+              });
+              // Now that we've initialized the JavaScript SDK, we call 
+              // FB.getLoginStatus().  This function gets the state of the
+              // person visiting this page and can return one of three states to
+              // the callback you provide.  They can be:
+              //
+              // 1. Logged into your app ('connected')
+              // 2. Logged into Facebook, but not your app ('not_authorized')
+              // 3. Not logged into Facebook and can't tell if they are logged into
+              //    your app or not.
+              //
+              // These three cases are handled in the callback function.
+             }
+
+            // My Code to hand off to the server after FB login
+            function sendTokenToServer(){
+              var access_token = FB.getAuthResponse()['accessToken']
+              console.log(access_token)
+              FB.api('/me', function(response){
+                console.log(JSON.stringify(response));
+                console.log("Successful login for: " + response.name);
+                $.ajax({
+                  type: 'POST',
+                  url: '/fbconnect?state={{STATE}}',
+                  processData: 'false',
+                  data: access_token,
+                  contentType: 'application/octet-stream; charset=utf-8',
+                  success: function(result){
+                    //Handle or Verify the server response
+                    if(result) {
+                      $("#result").html('Login Successful!</br>' + result + '</br> Redirecting....')
+                      setTimeout(function(){
+                      window.location.href = "/catalog";
+                      });
+                    }
+                  }
+                });
+              });
+            }
+  
+          </script>
+          <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js">
+            $("#login").hide();
+          </script>
+      <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
+      <a href = 'javascript:sendTokenToServer()'>Login with Facebook </a>
+      </fb:login-button>
+
+{% endblock %}
+

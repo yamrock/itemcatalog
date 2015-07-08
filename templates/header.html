@@ -1,0 +1,21 @@
+
+
+<div class = "row row-padded">
+  <div class = "col-md-6"> 
+    <h1> Catalog App <h1>
+  </div>
+  <div class = "col-md-6 text-right padding-top">
+    {% if 'username' not in session %}
+      <button id="login" type="button" onclick="location.href='/login'">Log In</button>
+    {% else %}
+    <button type="button" onclick="location.href='{{url_for('disconnect')}}'">Log Out </button>
+      {% endif %}
+
+      <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js">
+        function my_function() {
+          $("#login").hide()
+        }
+      </script>
+
+  </div>
+</div>
