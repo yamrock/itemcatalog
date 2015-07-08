@@ -76,5 +76,9 @@ Example JSON output
 
 ###To Do
 
-Create URLs for updating categories. The python code is in place. Only the HTML rendering remains. Leaving this out for now to accomodate for project delviery deadlines :) (Not in the requirements spec)
+*Create URLs for updating categories. The python code is in place. Only the HTML rendering remains. Leaving this out for now to accomodate for project delviery deadlines :) (Not in the requirements spec)
+
+*Database nitpick - implement cascade delete
+
+*Database populate - use json data to populate the database - one time touch of the DB rather than current method
 
