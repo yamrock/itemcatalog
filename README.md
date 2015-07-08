@@ -5,14 +5,22 @@ This provides a simple, plug and play, webapp to store and display items, sorted
 This webapp is built using python, the flask framework, Jinja and a few other technologies. Please make sure that the python libraries for the following are installed on your operating system
 
 *jinja[http://jinja.pocoo.org]
+
 *oauth[https://pypi.python.org/pypi/oauthlib]
+
 *bleach[https://pypi.python.org/pypi/bleach]
+
 *flask[http://flask.pocoo.org]
+
 *sqlalchemy[http://www.sqlalchemy.org]
+
 *httplib2[https://pypi.python.org/pypi/httplib2]
+
 *requests[http://docs.python-requests.org/en/latest/]
 
-```Example for a linux system:
+
+```
+Example for a linux system:
   
   apt-get -qqy install python-sqlalchemy
   apt-get -qqy install python-pip
@@ -35,7 +43,8 @@ This webapp is built using python, the flask framework, Jinja and a few other te
 ###API Extension
 The app provides a /catalog.json URI to present the entire catalog of items and associated categories as a JSON file, for any RESTful integration.
 
-```Example JSON output
+```
+Example JSON output
    {
      "categories": [
        {
