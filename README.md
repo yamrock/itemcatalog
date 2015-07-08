@@ -4,19 +4,19 @@ This provides a simple, plug and play, webapp to store and display items, sorted
 ###Requires
 This webapp is built using python, the flask framework, Jinja and a few other technologies. Please make sure that the python libraries for the following are installed on your operating system
 
-*jinja[http://jinja.pocoo.org]
+*[jinja](http://jinja.pocoo.org)
 
-*oauth[https://pypi.python.org/pypi/oauthlib]
+*[oauth](https://pypi.python.org/pypi/oauthlib)
 
-*bleach[https://pypi.python.org/pypi/bleach]
+*[bleach](https://pypi.python.org/pypi/bleach)
 
-*flask[http://flask.pocoo.org]
+*[flask](http://flask.pocoo.org)
 
-*sqlalchemy[http://www.sqlalchemy.org]
+*[sqlalchemy](http://www.sqlalchemy.org)
 
-*httplib2[https://pypi.python.org/pypi/httplib2]
+*[httplib2](https://pypi.python.org/pypi/httplib2)
 
-*requests[http://docs.python-requests.org/en/latest/]
+*[requests](http://docs.python-requests.org/en/latest/)
 
 
 ```
