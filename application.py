@@ -13,21 +13,16 @@ import httplib2
 import json
 from flask import make_response
 import requests
-
-def create_session():
-    #Call the create_engine to connect o the database
-    DB_engine = create_engine('sqlite:///catalog.db')
-    Base.metadata.bind = DB_engine
-    #The sessionmaker call, creates a factory which is named DB_Session
-    #This factory, when called, will create new DB_Session objects with the arguments give (Connect to DB_Engine) 
-    DBSession = sessionmaker(bind = DB_engine)
-    return DBSession()
-
+#Imports create_session, createUser, getUserInfo, getUserID, login_required
+from helper import *
+#Imports for 'login required', decorator
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = 'something_strong'
 
 @app.route('/catalog.json')
+@login_required
 def catalogJSON():
     '''
     Returns JSON data for the entire catalog
@@ -94,6 +89,7 @@ def showCatalog():
         return render_template("catalog.html", categories = categories, items = items)
 
 @app.route('/catalog/new/', methods=['GET', 'POST'])
+@login_required
 def newCategory():
     '''Allows authenticated users to add new categories. 
     Category Add/Delete/Edit is not required per P3 submission eval matrix
@@ -107,12 +103,10 @@ def newCategory():
         return redirect(url_for('showCatalog'))
     else:
         #It is a GET request
-        if 'username' not in login_session:
-            return("<h1> You have to be logged in to add a new catalog item</h1")
-        else:
-            return render_template('newcategory.html')
+        return render_template('newcategory.html')
 
 @app.route('/catalog/<int:category_id>/edit/', methods = ['GET', 'POST'])
+@login_required
 def editCategory(category_id):
     '''Allows authenticated users to edit exiting category names and description. 
     Category Add/Delete/Edit is not required per P3 submission eval matrix
@@ -130,18 +124,14 @@ def editCategory(category_id):
     else:
         #GET request, display the edit form
         session.close()
-        if 'username' not in login_session:
-            return("<h1> You have to be logged in to edit a catalog item</h1")
-        else:
-            return render_template('editCategory.html', category_id = category_id, current_category = editedCategory)
+        return render_template('editCategory.html', category_id = category_id, current_category = editedCategory)
 
 @app.route('/catalog/<int:category_id>/delete/', methods = ['GET', 'POST'])
+@login_required
 def deleteCategory(category_id):
     '''Allows authenticated users to delete exiting categories in the catalog. 
     Category Add/Delete/Edit is not required per P3 submission eval matrix
     '''
-    session = create_session()
-
     session = create_session()
     categoryToDelete = session.query(Category).filter_by(id = category_id).one()
     if request.method == 'POST':
@@ -153,9 +143,6 @@ def deleteCategory(category_id):
         return redirect(url_for('showCatalog'))
     else:
         #GET, display the form to delete the selected category
-        session.close()
-        if 'username' not in login_session:
-            return("<h1> You have to be logged in to delete a catalog item</h1")
         return render_template('deleteCategory.html', category_id = category_id, current_category = categoryToDelete)
 
 @app.route('/catalog/<path:category_name>/')
@@ -191,6 +178,7 @@ def showItemDetail(category_name, item_name):
         return render_template('itemDetails.html', item = item, category = category, categories = categories)
 
 @app.route('/catalog/<path:category_name>/new', methods = ['GET', 'POST'])
+@login_required
 def newItem(category_name):
     '''Allows users to add a new item to the catalog from within the category. 
     Use the URI instead of an integer to locate category items
@@ -206,12 +194,10 @@ def newItem(category_name):
         return redirect(url_for('showCatalog'))
     else:
         #GET method, display the item add form
-        if 'username' not in login_session:
-            return("<h1>You need to login in order to add new items</h1>")
-        else:
-            return render_template('newItem.html', category_name = category_name)
+        return render_template('newItem.html', category_name = category_name)
 
 @app.route('/catalog/newitem/', methods = ['GET', 'POST'])
+@login_required
 def newItemCategory():
     '''Allows users to add a new item to the catalog without having to first select the category. 
     It allows the users to select the category through a drop down list
@@ -231,12 +217,10 @@ def newItemCategory():
     else:
         #GET method, display the new item/category form
         session.close()
-        if 'username' not in login_session:
-            return("<h1>You need to login in order to add new items</h1>")
-        else:
-            return render_template('newItemCategory.html', categories = categories)
+        return render_template('newItemCategory.html', categories = categories)
 
 @app.route('/catalog/<path:category_name>/<path:item_name>/edit/', methods = ['GET', 'POST'])
+@login_required
 def editItem(category_name, item_name):
     '''Allows authenticated users to edit exiting item names and description. 
     '''
@@ -259,13 +243,11 @@ def editItem(category_name, item_name):
     else:
         #GET request, display the edit form
         session.close()
-        if 'username' not in login_session:
-            return("<h1>You are not logged in. Please login to edit an item</h1>")
-        else:
-            return render_template('editItem.html', category_name = category_name, item_name = item_name, item = editedItem,  categories = categories)
+        return render_template('editItem.html', category_name = category_name, item_name = item_name, item = editedItem,  categories = categories)
 
 
 @app.route('/catalog/<path:category_name>/<path:item_name>/delete/', methods = ['GET', 'POST'])
+@login_required
 def deleteItem(category_name, item_name):
     if request.method == 'POST':
         session = create_session()
@@ -277,10 +259,7 @@ def deleteItem(category_name, item_name):
         flash("You have successfully deleted the item")
         return redirect(url_for('showCatalog'))
     else:
-        if 'username' not in login_session:
-            return("<h1>You are not logged in. Please login to delete an item</h1>")
-        else:
-            return render_template('deleteItem.html', category_name = category_name, item_name = item_name)
+        return render_template('deleteItem.html', category_name = category_name, item_name = item_name)
  
 #OAuth Login Intergration
 @app.route('/login')
@@ -289,34 +268,6 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for x in range(32))
     login_session['state'] = state
     return render_template('login.html', STATE=state)
-
-# HELPER FUNCTIONS
-# These functions help interact with the DB to help validate/create users
-def createUser(login_session):
-    session = create_session()
-    newUser = User(name = login_session['username'], email = login_session['email'], picture = login_session['picture'])
-    session.add(newUser)
-    session.commit()
-    session.close()
-    user = session.query(User).filter_by(email = login_session['email']).one()
-    return user.id
-
-def getUserInfo(user_id):
-    session = create_session()
-    user = session.query(User).filter_by(id = user_id).one()
-    session.close()
-    return user
-
-def getUserID(email):
-    session = create_session()
-    try:
-        user = session.query(User).filter_by(email = email).one()
-        session.close()
-        return user.id
-    except:
-        session.close()
-        return None
-
 
 @app.route('/fbconnect', methods = ['POST'])
 def fbconnect():
