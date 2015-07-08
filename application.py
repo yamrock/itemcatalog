@@ -399,7 +399,7 @@ def disconnect():
             gdisconnect()
         if login_session['provider'] == "facebook":
             fbdisconnect()
-        flash("You have successfully been logged out")
+        #flash("You have successfully been logged out")
         return redirect(url_for('showCatalog'))
     else:
         #You are not currently logged in
@@ -409,6 +409,6 @@ def disconnect():
 
 
 if (__name__ == '__main__'):
-    app.debug = True
+    app.debug = False
     app.run(host = '0.0.0.0', port = 5000)
 
