@@ -37,6 +37,7 @@ Example for a linux system:
 1. Download the application : git clone https://github.com/yamrock/itemcatalog.git
 2. execute: python database_setup.py (sets up the catalog.db)
 3. Optional: python database_populate (adds some arbitary sample data)
+4. execute: python application.py. The app is configured to listen on port 5000, but you can change it to any port by editing the listener port in application.py
 
 *CAUTION: The facebook app client secret is being published in this repository, since this is for Udacity eval. In reality, you will need to register the app using your facebook credentials and update the fbclientsecrets.json file with your info and save it securely on your server*
 
