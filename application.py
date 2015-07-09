@@ -22,54 +22,62 @@ app = Flask(__name__)
 app.secret_key = 'something_strong'
 
 @app.route('/catalog.json')
-@login_required
 def catalogJSON():
     '''
     Returns JSON data for the entire catalog
     '''
-    #Here, we use a 2D array. We iterate through each category, serialize it and hold it in the catalog[]. Then, within each 
-    #category, we iterate through the items within that category and collect the serialized version of each items inside items_per_category[]
+    #Here, we use an array to collect a nested set of deictionaries. We then invoke flask's jsonify, to present this as JSON data. 
+    #We iterate through each category, serialize it and hold it in the dict next_category. We then append a serialized dictionary if items
+    #as a dictionary key/value pair  
     #We then append this list to the catalog[]
     ''' SAMPLE
+ {
+  "categories": [
     {
-      "categories": [
+      "desc": "Used to getting hit by bats",
+      "id": 1,
+      "items": [
         {
-          "desc": "Bats are used for hitting balls",
-          "name": "Bats",
-          "id": 2
+          "cat_id": 1,
+          "desc": "Plastic sphere heavy",
+          "id": 2,
+          "name": "Bowling ball"
         },
-        [
-          {
-            "cat_id": 2,
-            "desc": "light and netty",
-            "id": 4,
-            "name": "badminton bat"
-          }
-        ],
-        [
-          {   
-            "cat_id": 2,
-            "desc": "kdlkjldkf",
-            "id": 5,
-            "name": "klakj"
-          }
-        ],
-      ]
-     }
+        {
+          "cat_id": 1,
+          "desc": "Light, burns with a smell of Camphor",
+          "id": 8,
+          "name": "ping pong ball"
+        },
+        {
+          "cat_id": 1,
+          "desc": "Heavy ball, for grown ups who want to play marbles",
+          "id": 15,
+          "name": "Bocce Ball"
+        }
+      ],
+      "name": "balls"
+     },
+    } 
 
     '''
     session = create_session()
     #First, collect all category objects to iterate
     categories = session.query(Category).all()
-    #Initialize the 2D array
+    #Initialize the array
     catalog = []
     for category in categories:
         #intitialize the items per category for each category
         items_per_category = []
-        catalog.append(category.serialize)
+        #initialize (each iteration) and collect the serialized category as dict 
+        next_category = category.serialize
+        #Now serialize the items within that category
         for item in category.items:
             items_per_category.append(item.serialize)
-        catalog.append(items_per_category)
+        #Append the catetgory list, with the serialized (list of dicts) of items
+        next_category['items'] = items_per_category
+        #Add the category(&items) to the catalog list
+        catalog.append(next_category)
     return jsonify(categories = catalog)
 
 @app.route('/')
@@ -360,6 +368,6 @@ def disconnect():
 
 
 if (__name__ == '__main__'):
-    app.debug = False
+    app.debug = false
     app.run(host = '0.0.0.0', port = 5000)
 
