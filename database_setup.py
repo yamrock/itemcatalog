@@ -38,7 +38,7 @@ class Item(Base):
     description = Column(String(500), nullable=False)
     creation_time = Column(DateTime, default=datetime.datetime.utcnow)
     category_id = Column(Integer, ForeignKey('category.id'))
-    category = relationship(Category, backref=backref('items', uselist = True))
+    category = relationship(Category, backref=backref('items', uselist = True, cascade="all,delete"))
 
     @property
     def serialize(self):
