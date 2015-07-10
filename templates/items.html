@@ -6,7 +6,7 @@
     <h2> Categories </h2>
     {% for category in categories %}
     <div class = 'categories padding-top'>
-      <a href = {{url_for('showItems', category_name = category.name)}}><h4>{{category.name}}</h4></a>
+      <a href = {{url_for('showItems', category_id = category.id)}}><h4>{{category.name}}</h4></a>
     </div>
     {% endfor %}
   </div>
@@ -17,10 +17,10 @@
      {{category.description}}
     </p>
     {% for i in items %}
-      <div class = 'item-list'> <a href = {{url_for('showItemDetail', category_name = category.name, item_name = i.name)}}>  {{i.name}} </a> </div>
+      <div class = 'item-list'> <a href = {{url_for('showItemDetail', category_id = category.id, item_id = i.id)}}>  {{i.name}} </a> </div>
     {% endfor %}
 
-    <div class = 'btn padding-top'> <a href = {{url_for('newItem', category_name = category.name)}}> Add Item </a></div>
+    <div class = 'btn padding-top'> <a href = {{url_for('newItem', category_id = category.id)}}> Add Item </a></div>
   </div>
 </div>
 

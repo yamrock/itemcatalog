@@ -22,7 +22,7 @@
     <h2> Categories </h2>
     {% for category in categories %}
     <div class = 'categories padding-top'>
-      <a href = {{url_for('showItems', category_name = category.name)}}><h4>{{category.name}}</h4></a>
+      <a href = {{url_for('showItems', category_id = category.id)}}><h4>{{category.name}}</h4></a>
     </div>
     {% endfor %}
   </div>
@@ -31,7 +31,7 @@
     <div class = 'btn'> <strong> <a href = {{url_for('newItemCategory')}}> Add Item </a> </strong></div>
       {% for item in items %}
       <li class = 'items, padding-top'>
-        <a href = {{url_for('showItemDetail', category_name = item.category.name, item_name = item.name )}}>{{item.name}}</a>
+        <a href = {{url_for('showItemDetail', category_id = item.category.id, item_id = item.id )}}>{{item.name}}</a>
         <em>( {{item.category.name}} )</em>
       </li>
       {% endfor %}

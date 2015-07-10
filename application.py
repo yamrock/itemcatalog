@@ -74,7 +74,7 @@ def catalogJSON():
         #Now serialize the items within that category
         for item in category.items:
             items_per_category.append(item.serialize)
-        #Append the catetgory list, with the serialized (list of dicts) of items
+        #Append the catetgory dict, with the serialized (list of dicts) items within that category
         next_category['items'] = items_per_category
         #Add the category(&items) to the catalog list
         catalog.append(next_category)
@@ -153,15 +153,15 @@ def deleteCategory(category_id):
         #GET, display the form to delete the selected category
         return render_template('deleteCategory.html', category_id = category_id, current_category = categoryToDelete)
 
-@app.route('/catalog/<path:category_name>/')
-@app.route('/catalog/<path:category_name>/items/')
-def showItems(category_name):
+@app.route('/catalog/<int:category_id>/')
+@app.route('/catalog/<int:category_id>/items/')
+def showItems(category_id):
     '''Allows users to view exiting categories and their items in the catalog. 
     Use the URI instead of an integer to locate category items
     '''
     session = create_session()
     categories = session.query(Category).all()
-    category = session.query(Category).filter_by(name = category_name).one()
+    category = session.query(Category).filter_by(id = category_id).one()
     items = session.query(Item).filter_by(category_id = category.id).all()
     numberOfItems = session.query(Item).filter_by(category_id = category.id).count()
     session.close()
@@ -170,30 +170,31 @@ def showItems(category_name):
     else:
         return render_template('items.html', items = items, numItems = numberOfItems, category = category, categories = categories)
                 
-@app.route('/catalog/<path:category_name>/<path:item_name>/')
-def showItemDetail(category_name, item_name):
+@app.route('/catalog/<int:category_id>/<int:item_id>/')
+def showItemDetail(category_id, item_id):
     '''Allows users to view the details of a catalog item on selecting it. 
     Use the URI instead of an integer to locate category items
     '''
     session = create_session()
-    category = session.query(Category).filter_by(name = category_name).one()
+    category = session.query(Category).filter_by(id = category_id).one()
     categories = session.query(Category).all()
-    item = session.query(Item).filter_by(category_id = category.id, name = item_name  ).one()
+    item = session.query(Item).filter_by(category_id = category.id, id = item_id  ).one()
     session.close()
     if 'username' not in login_session:
         return render_template('publicitemDetails.html', item = item, category = category, categories = categories)
     else:
         return render_template('itemDetails.html', item = item, category = category, categories = categories)
 
-@app.route('/catalog/<path:category_name>/new', methods = ['GET', 'POST'])
+@app.route('/catalog/<int:category_id>/new', methods = ['GET', 'POST'])
 @login_required
-def newItem(category_name):
+def newItem(category_id):
     '''Allows users to add a new item to the catalog from within the category. 
     Use the URI instead of an integer to locate category items
     '''
+    session = create_session()
+    category = session.query(Category).filter_by(id = category_id).one()
+
     if request.method == 'POST':
-        session = create_session()
-        category = session.query(Category).filter_by(name = category_name).one()
         newItem = Item(name = str(bleach.clean(request.form['itemName'])), description = str(bleach.clean(request.form['description'])), category_id = category.id)
         session.add(newItem)
         session.commit()
@@ -202,7 +203,7 @@ def newItem(category_name):
         return redirect(url_for('showCatalog'))
     else:
         #GET method, display the item add form
-        return render_template('newItem.html', category_name = category_name)
+        return render_template('newItem.html', category_id = category.id, category_name = category.name)
 
 @app.route('/catalog/newitem/', methods = ['GET', 'POST'])
 @login_required
@@ -227,15 +228,15 @@ def newItemCategory():
         session.close()
         return render_template('newItemCategory.html', categories = categories)
 
-@app.route('/catalog/<path:category_name>/<path:item_name>/edit/', methods = ['GET', 'POST'])
+@app.route('/catalog/<int:category_id>/<int:item_id>/edit/', methods = ['GET', 'POST'])
 @login_required
-def editItem(category_name, item_name):
+def editItem(category_id, item_id):
     '''Allows authenticated users to edit exiting item names and description. 
     '''
     session = create_session()
-    category = session.query(Category).filter_by(name = category_name).one()
+    category = session.query(Category).filter_by(id = category_id).one()
     categories = session.query(Category).all()
-    editedItem = session.query(Item).filter_by(name = item_name, category_id = category.id).one()
+    editedItem = session.query(Item).filter_by(id = item_id, category_id = category.id).one()
     if request.method == 'POST':
         category_name = str(bleach.clean(request.form['categoryName']))
         category = session.query(Category).filter_by(name = category_name).one()
@@ -244,6 +245,7 @@ def editItem(category_name, item_name):
         if request.form['description']:
             editedItem.description = str(bleach.clean(request.form['description']))
         editedItem.category_id = category.id
+        print "You have added %s to %s" % (editedItem.name, category.name)
         session.commit()
         session.close()
         flash("You have successfully updated the item")
@@ -251,23 +253,25 @@ def editItem(category_name, item_name):
     else:
         #GET request, display the edit form
         session.close()
-        return render_template('editItem.html', category_name = category_name, item_name = item_name, item = editedItem,  categories = categories)
+        return render_template('editItem.html', category_id = category_id, item_id = item_id, item = editedItem,  categories = categories)
 
 
-@app.route('/catalog/<path:category_name>/<path:item_name>/delete/', methods = ['GET', 'POST'])
+@app.route('/catalog/<int:category_id>/<int:item_id>/delete/', methods = ['GET', 'POST'])
 @login_required
-def deleteItem(category_name, item_name):
+def deleteItem(category_id, item_id):
+    session = create_session()
+    category = session.query(Category).filter_by(id = category_id).one()
+    itemToDelete = session.query(Item).filter_by(id = item_id, category_id = category.id).one()
+
     if request.method == 'POST':
-        session = create_session()
-        category = session.query(Category).filter_by(name = category_name).one()
-        itemToDelete = session.query(Item).filter_by(name = item_name, category_id = category.id).one()
         session.delete(itemToDelete)
         session.commit()
         session.close()
         flash("You have successfully deleted the item")
         return redirect(url_for('showCatalog'))
     else:
-        return render_template('deleteItem.html', category_name = category_name, item_name = item_name)
+        session.close()
+        return render_template('deleteItem.html', category_id = category_id, item_id = item_id, item_name = itemToDelete.name)
  
 #OAuth Login Intergration
 @app.route('/login')
@@ -368,6 +372,6 @@ def disconnect():
 
 
 if (__name__ == '__main__'):
-    app.debug = false
+    app.debug = True
     app.run(host = '0.0.0.0', port = 5000)
 

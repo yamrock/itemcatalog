@@ -3,7 +3,7 @@
 {% include "header.html" %}
     <h3> New item under {{category_name}} </h3>
 
-    <form action = "{{url_for('newItem', category_name = category_name)}}" method = 'POST' id = 'newItem'>
+    <form action = "{{url_for('newItem', category_id = category_id)}}" method = 'POST' id = 'newItem'>
       Name: <input type = 'text' size = '30' name = itemName> 
       <input type = "submit" value = "Submit">
     </form><br>
